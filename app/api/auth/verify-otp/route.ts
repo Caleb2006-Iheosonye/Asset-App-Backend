@@ -9,20 +9,24 @@ const corsHeaders = {
 };
 
 export async function POST(request: NextRequest) {
-  const { email, password } = await request.json();
+  const { email, token } = await request.json();
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: 'signup',
+  });
 
- if (error) {
-  console.error('Signup error:', error.message);
-  return NextResponse.json(
-    { data: null, error: error.message },
-    { status: error.status || 400, headers: corsHeaders }
-  );
-}
+  if (error) {
+    console.error('Verify OTP error:', error.message);
+    return NextResponse.json(
+      { data: null, error: error.message },
+      { status: error.status || 400, headers: corsHeaders }
+    );
+  }
 
   return NextResponse.json({ data, error }, { headers: corsHeaders });
 }
