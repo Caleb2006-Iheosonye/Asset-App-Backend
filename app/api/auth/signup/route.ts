@@ -9,12 +9,19 @@ const corsHeaders = {
 };
 
 export async function POST(request: NextRequest) {
-  const { email, password } = await request.json();
+  const { email, password, firstName, lastName } = await request.json();
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({ email, password ,
+    options: {
+      data:{
+        first_name: firstName,
+        last_name: lastName,
+        
+      }
+  }});
 
  if (error) {
   console.error('Signup error:', error.message);

@@ -9,15 +9,22 @@ const corsHeaders = {
 };
 
 export async function POST(request: NextRequest) {
-  const { email, token } = await request.json();
+  const { email, token, type } = await request.json();
+const allowedTypes = ['signup', 'recovery'] as const;
 
+if (!allowedTypes.includes(type)) {
+  return NextResponse.json(
+    { data: null, error: 'Invalid verification type' },
+    { status: 400, headers: corsHeaders }
+  );
+}
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
   const { data, error } = await supabase.auth.verifyOtp({
     email,
     token,
-    type: 'signup',
+    type,
   });
 
   if (error) {
